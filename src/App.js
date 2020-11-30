@@ -3,6 +3,8 @@ import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import Notification from './components/Notification'
+import LoginForm from './components/LoginForm'
+import NewBlogForm from './components/NewBlogForm'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -10,6 +12,7 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
+  const [newBlogData, setNewBlogData] = useState({title:'', author:'', url:''})
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -20,7 +23,9 @@ const App = () => {
   useEffect(() => {
     const userData = window.localStorage.getItem('loggedUser')
     if(userData){
-      setUser(JSON.parse(userData))
+      const user = JSON.parse(userData)
+      setUser(user)
+      blogService.setToken(user.token)
     }
   },[])
 
@@ -32,6 +37,7 @@ const App = () => {
         window.localStorage.setItem('loggedUser', JSON.stringify(user))
       }
       setUser(user)
+      blogService.setToken(user.token)
       setUsername('')
       setPassword('')
       setNotification({data:'Login Successful', color:'green'})
@@ -56,27 +62,20 @@ const App = () => {
     }, 3000 )
   }
 
-
-  const loginForm = (
-    <form onSubmit={handleLogin}>  
-    <div>
-      <h4>Please log in</h4>
-      username
-      <input type='text'
-      value={username}
-      name='Username'
-      onChange={({target}) => setUsername(target.value)}/>
-    </div>
-    <div>
-      password
-      <input type='password'
-      value={password}
-      name='Password'
-      onChange={({target}) => setPassword(target.value)}/>
-    </div>
-    <button type='submit'>Login</button>
-  </form>
-  )
+  const handleNewBlog = async (event) => {
+    event.preventDefault()
+    try {
+      const response = await blogService.create(newBlogData)
+      console.log(response)
+      setBlogs(blogs.concat(response))
+      setNotification({data:'Added new Blog', color:'blue'})
+      setTimeout(() => {
+        setNotification('')
+      }, 3000 )
+    } catch (e) {
+      
+    }
+  }
 
   return (
     <div>
@@ -84,17 +83,20 @@ const App = () => {
 
       <Notification data={notification.data} color={notification.color}/>
       {user === null ?
-        loginForm :
+        <LoginForm handleLogin={handleLogin} 
+        username={username} 
+        setUsername={setUsername} 
+        password={password}
+        setPassword={setPassword}  
+        /> :
         <div>
           <p>{user.username} is logged in <button onClick={handleLogout}>Logout</button> </p>
+          <NewBlogForm handleNewBlog={handleNewBlog} newBlogData={newBlogData} setNewBlogData={setNewBlogData} />
           {blogs.map(blog =>
           <Blog key={blog.id} blog={blog} />
           )}
         </div>
       }
-
-
-
 
     </div>
   )
