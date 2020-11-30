@@ -8,7 +8,7 @@ import NewBlogForm from './components/NewBlogForm'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [notification, setNotification] = useState({})
+  const [notification, setNotification] = useState({data:null})
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
@@ -73,7 +73,7 @@ const App = () => {
         setNotification('')
       }, 3000 )
     } catch (e) {
-      
+      console.log(e)
     }
   }
 
