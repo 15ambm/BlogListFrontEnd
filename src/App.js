@@ -100,6 +100,28 @@ const App = () => {
     setBlogs(updatedBlogs)
   }
 
+  const handleDeleteBlog = async (blogData) => {
+    try { const blogID = blogData.id
+      console.log(blogData)
+      await blogService.remove(blogID)
+      let updatedBlogs = []
+      for(let i = 0; i < blogs.length; i++) {
+        if (blogs[i].id  !== blogID) updatedBlogs.push(blogs[i])
+      }
+      setBlogs(updatedBlogs)
+      setNotification({data:'Successfully Delelted Blog', color:'blue'})
+      setTimeout(() => {
+        setNotification('')
+      }, 4000 )
+    }
+    catch(e) {
+      setNotification({data:'You do not have permission to delete that blog', color:'red'})
+      setTimeout(() => {
+        setNotification('')
+      }, 4000 )
+    }
+  }
+
   return (
     <div>
       <h2>Blogs</h2>
@@ -118,7 +140,7 @@ const App = () => {
             <NewBlogForm createBlog={handleNewBlog} />
           </Togglable>
           {blogs.map(blog =>
-            <Blog key={blog.id} blog={blog} handleLike={handleNewLike}/>
+            <Blog key={blog.id} blog={blog} handleLike={handleNewLike} deleteBlog={handleDeleteBlog}/>
           )}
         </div>
       }
