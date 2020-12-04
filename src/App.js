@@ -101,7 +101,10 @@ const App = () => {
   }
 
   const handleDeleteBlog = async (blogData) => {
-    try { const blogID = blogData.id
+    const result = window.confirm('Are you sure you want to delete this blog')
+    if (!result) return
+    try { 
+      const blogID = blogData.id
       console.log(blogData)
       await blogService.remove(blogID)
       let updatedBlogs = []
