@@ -17,8 +17,14 @@ const App = () => {
   const blogFormRef = useRef()
   
   useEffect(() => {
-    blogService.getAll().then(blogs =>
+    blogService.getAll().then(blogs => {
+      blogs.sort((a, b) => {
+        if(a.likes < b.likes) return 1
+        if(a.likes > b.likes) return -1
+        else return 0
+      })
       setBlogs( blogs )
+    }
     )  
   }, [])
 
@@ -81,8 +87,10 @@ const App = () => {
   const handleNewLike = async (blogData) => {
     const updatedBlogData = {
       ...blogData,
-      likes: blogData.likes + 1
+      likes: blogData.likes + 1,
+      user:blogData.user.id
     }
+
     const response = await blogService.update(updatedBlogData, blogData.id)
     let updatedBlogs = []
     for(let i = 0; i < blogs.length; i++) {
