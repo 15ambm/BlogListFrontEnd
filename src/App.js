@@ -78,6 +78,20 @@ const App = () => {
     }
   }
 
+  const handleNewLike = async (blogData) => {
+    const updatedBlogData = {
+      ...blogData,
+      likes: blogData.likes + 1
+    }
+    const response = await blogService.update(updatedBlogData, blogData.id)
+    let updatedBlogs = []
+    for(let i = 0; i < blogs.length; i++) {
+      if (blogs[i].id  !== response.data.id) updatedBlogs.push(blogs[i])
+      else updatedBlogs.push(response.data)
+    }
+    setBlogs(updatedBlogs)
+  }
+
   return (
     <div>
       <h2>Blogs</h2>
@@ -96,7 +110,7 @@ const App = () => {
             <NewBlogForm createBlog={handleNewBlog} />
           </Togglable>
           {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
+            <Blog key={blog.id} blog={blog} handleLike={handleNewLike}/>
           )}
         </div>
       }
